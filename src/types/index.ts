@@ -9,3 +9,4 @@ export interface FlashCard {
 
 export type AppTab = 'study' | 'list' | 'add' | 'settings';
 export type ListFilter = 'all' | 'learned' | 'unlearned';
+export type StudyMode = 'all' | 'skip-learned' | 'learned-only';

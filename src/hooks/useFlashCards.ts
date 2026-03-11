@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { FlashCard, ListFilter } from '../types';
+import { FlashCard, ListFilter, StudyMode } from '../types';
 import { STORAGE_KEY } from '../constants';
 
 type EditValues = {
@@ -22,6 +22,7 @@ export const useFlashCards = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [listFilter, setListFilter] = useState<ListFilter>('all');
+  const [studyMode, setStudyMode] = useState<StudyMode>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<EditValues>({ word: '', meaning: '', example: '' });
   const [isHydrated, setIsHydrated] = useState(false);
@@ -82,29 +83,35 @@ export const useFlashCards = () => {
     setEditingId(null);
   }, [editValues, editingId]);
 
+  const studyCards = useMemo(() => {
+    if (studyMode === 'skip-learned') return cards.filter((card) => !card.isLearned);
+    if (studyMode === 'learned-only') return cards.filter((card) => card.isLearned);
+    return cards;
+  }, [cards, studyMode]);
+
   const handleNext = useCallback(() => {
-    if (cards.length === 0) return;
+    if (studyCards.length === 0) return;
     if (isFlipped) {
       setIsFlipped(false);
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % cards.length);
+        setCurrentIndex((prev) => (prev + 1) % studyCards.length);
       }, 150);
     } else {
-      setCurrentIndex((prev) => (prev + 1) % cards.length);
+      setCurrentIndex((prev) => (prev + 1) % studyCards.length);
     }
-  }, [cards.length, isFlipped]);
+  }, [studyCards.length, isFlipped]);
 
   const handlePrev = useCallback(() => {
-    if (cards.length === 0) return;
+    if (studyCards.length === 0) return;
     if (isFlipped) {
       setIsFlipped(false);
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
+        setCurrentIndex((prev) => (prev - 1 + studyCards.length) % studyCards.length);
       }, 150);
     } else {
-      setCurrentIndex((prev) => (prev - 1 + cards.length) % cards.length);
+      setCurrentIndex((prev) => (prev - 1 + studyCards.length) % studyCards.length);
     }
-  }, [cards.length, isFlipped]);
+  }, [studyCards.length, isFlipped]);
 
   const shuffleCards = useCallback(() => {
     setIsFlipped(false);
@@ -177,6 +184,17 @@ export const useFlashCards = () => {
     });
   }, [cards, listFilter, searchTerm]);
 
+  useEffect(() => {
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  }, [studyMode]);
+
+  useEffect(() => {
+    if (studyCards.length > 0 && currentIndex >= studyCards.length) {
+      setCurrentIndex(studyCards.length - 1);
+    }
+  }, [studyCards.length, currentIndex]);
+
   return {
     cards,
     currentIndex,
@@ -187,6 +205,8 @@ export const useFlashCards = () => {
     setSearchTerm,
     listFilter,
     setListFilter,
+    studyMode,
+    setStudyMode,
     editingId,
     editValues,
     setEditValues,
@@ -199,6 +219,7 @@ export const useFlashCards = () => {
     exportCSV,
     importCSV,
     filteredCards,
+    studyCards,
     handleNext,
     handlePrev,
     shuffleCards,

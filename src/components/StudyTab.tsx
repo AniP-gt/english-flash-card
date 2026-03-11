@@ -1,10 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { CheckCircle2, ChevronLeft, ChevronRight, RotateCw } from 'lucide-react';
-import type { FlashCard as FlashCardType, AppTab } from '../types';
+import type { FlashCard as FlashCardType, AppTab, StudyMode } from '../types';
 import FlashCard from './FlashCard';
 
 type StudyTabProps = {
   cards: FlashCardType[];
+  allCardsCount: number;
   currentIndex: number;
   isFlipped: boolean;
   handleNext: () => void;
@@ -14,10 +15,19 @@ type StudyTabProps = {
   speak: (value: string) => void;
   shuffleCards: () => void;
   setActiveTab: Dispatch<SetStateAction<AppTab>>;
+  studyMode: StudyMode;
+  setStudyMode: Dispatch<SetStateAction<StudyMode>>;
 };
+
+const STUDY_MODE_OPTIONS: { value: StudyMode; label: string }[] = [
+  { value: 'all', label: '全て' },
+  { value: 'skip-learned', label: '未習得のみ' },
+  { value: 'learned-only', label: '覚えたのみ' },
+];
 
 const StudyTab = ({
   cards,
+  allCardsCount,
   currentIndex,
   isFlipped,
   handleNext,
@@ -27,6 +37,8 @@ const StudyTab = ({
   speak,
   shuffleCards,
   setActiveTab,
+  studyMode,
+  setStudyMode,
 }: StudyTabProps) => {
   const hasCards = cards.length > 0;
 
@@ -43,12 +55,32 @@ const StudyTab = ({
         }}
       />
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="flex justify-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+          {STUDY_MODE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setStudyMode(option.value)}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                studyMode === option.value
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
         {hasCards ? (
           <>
             <div className="flex justify-between items-center mb-2 text-sm text-slate-500 dark:text-slate-400 font-medium">
               <div className="flex items-center gap-2">
                 <span>
-                  Card {currentIndex + 1} of {cards.length}
+                  {currentIndex + 1} / {cards.length}
+                  {studyMode !== 'all' && (
+                    <span className="text-slate-400 dark:text-slate-500 ml-1">（全 {allCardsCount}）</span>
+                  )}
                 </span>
                 {cards[currentIndex].isLearned && (
                   <span className="flex items-center gap-1 text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full text-xs">
@@ -95,14 +127,40 @@ const StudyTab = ({
           </>
         ) : (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700">
-            <p className="text-slate-500">カードがありません</p>
-            <button
-              type="button"
-              onClick={() => setActiveTab('add')}
-              className="mt-4 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
-            >
-              単語を追加する
-            </button>
+            {studyMode === 'skip-learned' && allCardsCount > 0 ? (
+              <>
+                <p className="text-slate-500">全てのカードを覚えました！</p>
+                <button
+                  type="button"
+                  onClick={() => setStudyMode('all')}
+                  className="mt-4 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+                >
+                  全て表示に戻す
+                </button>
+              </>
+            ) : studyMode === 'learned-only' && allCardsCount > 0 ? (
+              <>
+                <p className="text-slate-500">まだ覚えたカードがありません</p>
+                <button
+                  type="button"
+                  onClick={() => setStudyMode('all')}
+                  className="mt-4 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+                >
+                  全て表示に戻す
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-slate-500">カードがありません</p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('add')}
+                  className="mt-4 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+                >
+                  単語を追加する
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

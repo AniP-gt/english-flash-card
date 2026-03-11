@@ -24,6 +24,8 @@ const App = () => {
     setSearchTerm,
     listFilter,
     setListFilter,
+    studyMode,
+    setStudyMode,
     editingId,
     editValues,
     setEditValues,
@@ -36,6 +38,7 @@ const App = () => {
     exportCSV,
     importCSV,
     filteredCards,
+    studyCards,
     handleNext,
     handlePrev,
     shuffleCards,
@@ -89,7 +92,8 @@ const App = () => {
         <main className="max-w-xl mx-auto px-4 py-8">
           {activeTab === 'study' && (
             <StudyTab
-              cards={cards}
+              cards={studyCards}
+              allCardsCount={cards.length}
               currentIndex={currentIndex}
               isFlipped={isFlipped}
               handleNext={handleNext}
@@ -99,6 +103,8 @@ const App = () => {
               speak={speak}
               shuffleCards={shuffleCards}
               setActiveTab={setActiveTab}
+              studyMode={studyMode}
+              setStudyMode={setStudyMode}
             />
           )}
 
