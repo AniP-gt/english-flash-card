@@ -70,6 +70,7 @@ export const useFlashCards = () => {
 
   const toggleLearned = useCallback((id: string) => {
     setCards((prev) => prev.map((card) => (card.id === id ? { ...card, isLearned: !card.isLearned } : card)));
+    setIsFlipped(false);
   }, []);
 
   const startEditing = useCallback((card: FlashCard) => {
