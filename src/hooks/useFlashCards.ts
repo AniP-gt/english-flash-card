@@ -42,7 +42,11 @@ export const useFlashCards = () => {
 
   useEffect(() => {
     if (!isHydrated || typeof window === 'undefined') return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    if (cards.length === 0) {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    }
   }, [cards, isHydrated]);
 
   const addCard = useCallback((payload: AddCardInput): AddCardResult => {
@@ -120,6 +124,17 @@ export const useFlashCards = () => {
       setCards((prev) => [...prev].sort(() => Math.random() - 0.5));
       setCurrentIndex(0);
     }, 50);
+  }, []);
+
+  const clearCache = useCallback(() => {
+    setCards([]);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setSearchTerm('');
+    setListFilter('all');
+    setStudyMode('all');
+    setEditingId(null);
+    setEditValues({ word: '', meaning: '', example: '' });
   }, []);
 
   const exportCSV = useCallback(() => {
@@ -224,5 +239,6 @@ export const useFlashCards = () => {
     handleNext,
     handlePrev,
     shuffleCards,
+    clearCache,
   };
 };

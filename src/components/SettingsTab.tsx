@@ -8,9 +8,10 @@ type SettingsTabProps = {
   setSelectedVoiceURI: Dispatch<SetStateAction<string>>;
   speak: (value: string) => void;
   setActiveTab: Dispatch<SetStateAction<AppTab>>;
+  clearCache: () => void;
 };
 
-const SettingsTab = ({ voices, selectedVoiceURI, setSelectedVoiceURI, speak, setActiveTab }: SettingsTabProps) => {
+const SettingsTab = ({ voices, selectedVoiceURI, setSelectedVoiceURI, speak, setActiveTab, clearCache }: SettingsTabProps) => {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border dark:border-slate-700 animate-in fade-in duration-200">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -35,18 +36,25 @@ const SettingsTab = ({ voices, selectedVoiceURI, setSelectedVoiceURI, speak, set
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => speak('Voice test complete.')}
-          className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 rounded-xl font-bold hover:bg-slate-200 transition"
-        >
-          テスト再生
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('study')}
-          className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl mt-4 shadow-md active:scale-95 transition"
-        >
+          <button
+            type="button"
+            onClick={() => speak('Voice test complete.')}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 rounded-xl font-bold hover:bg-slate-200 transition"
+          >
+            テスト再生
+          </button>
+          <button
+            type="button"
+            onClick={clearCache}
+            className="w-full flex items-center justify-center gap-2 py-3 text-red-600 border border-red-200 dark:border-red-500/50 rounded-xl font-bold hover:bg-red-50 dark:hover:bg-red-500/10 transition"
+          >
+            単語キャッシュを完全にクリア
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('study')}
+            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl mt-4 shadow-md active:scale-95 transition"
+          >
           完了
         </button>
       </div>

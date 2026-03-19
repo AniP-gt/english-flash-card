@@ -42,6 +42,7 @@ const App = () => {
     handleNext,
     handlePrev,
     shuffleCards,
+    clearCache,
   } = useFlashCards();
 
   const { voices, selectedVoiceURI, setSelectedVoiceURI, speak } = useSpeech();
@@ -136,6 +137,7 @@ const App = () => {
               setSelectedVoiceURI={setSelectedVoiceURI}
               speak={speak}
               setActiveTab={setActiveTab}
+              clearCache={clearCache}
             />
           )}
         </main>
